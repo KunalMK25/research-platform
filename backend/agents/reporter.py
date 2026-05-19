@@ -31,22 +31,20 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         contradictions_text = "\n".join([f"- {c}" for c in contradictions]) if contradictions else "No major contradictions or conflicting claims were identified among the verified sources."
         
         prompt = f"""
-        You are an expert Research Reporter. Assemble the final professional markdown research report on the topic '{topic}'.
+        Assemble a markdown report on '{topic}'.
         
-        Using the synthesized findings and identified contradictions, compile a polished, executive-ready research document.
-        
-        You MUST structure the report with these EXACT section headings in this order (and do not add other outer headings, although you should write insightful paragraphs under each):
-        
-        # Executive Summary
-        (A concise, high-level overview of the most critical discoveries and insights regarding '{topic}')
-        
+        Use the following synthesized findings:
         {synthesis_text}
         
-        ## Contradictions & Conflicting Claims
+        Contradictions:
         {contradictions_text}
         
+        Structure EXACTLY:
+        # Executive Summary
+        ## Findings: [subtopic]
+        ## Contradictions & Conflicting Claims
         ## References
-        (Compile a bibliography of cited source domains. Gather all '[Source: domain.com]' mentions in the text and list the unique domains in a clean bulleted list, such as '- domain.com')
+        (Compile bibliography from [Source: domain.com] tags)
         """
         
         response = client.chat.completions.create(
