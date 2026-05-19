@@ -127,7 +127,7 @@ export default function ResearchSessionPage() {
     return () => {
       eventSource.close();
     };
-  }, [sessionId, overallStatus]);
+  }, [sessionId]);
 
   // Helper to determine the state of a step
   const getStepState = (stepId: string) => {
