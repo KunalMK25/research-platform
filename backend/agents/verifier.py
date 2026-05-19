@@ -21,7 +21,6 @@ async def run_verifier(sources_by_subtopic: dict) -> dict:
         "contradictions": list[str]
     }
     """
-    client = _get_client()
     verified_sources = {}
     all_contradictions = []
     
@@ -31,6 +30,7 @@ async def run_verifier(sources_by_subtopic: dict) -> dict:
             continue
             
         try:
+            client = _get_client()
             sources_context = json.dumps([{"url": s["url"], "snippet": s["snippet"]} for s in sources])
             
             prompt = f"""
@@ -77,9 +77,9 @@ async def run_verifier(sources_by_subtopic: dict) -> dict:
                 
         except Exception as e:
             logging.error(f"Verifier failed for {subtopic}: {e}")
-            # Fallback: score all sources as 5 (keep them)
+            # Fallback: score all sources highly (keep them)
             for s in sources:
-                s["credibility_score"] = 5
+                s["credibility_score"] = 8
             verified_sources[subtopic] = sources
             
     return {

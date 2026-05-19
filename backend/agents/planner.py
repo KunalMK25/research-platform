@@ -66,8 +66,17 @@ async def run_planner(topic: str, depth: str) -> list[str]:
         return subtopics[:num_subtopics]
     except Exception as e:
         logging.error(f"Planner failed: {e}")
-        # fallback
-        return [f"{topic} Overview", f"Core aspects of {topic}", f"Future trends of {topic}"][:{"Quick": 3, "Standard": 5, "Deep": 6}.get(depth, 5)]
+        # robust fallback list to fully satisfy Quick, Standard, and Deep requests
+        fallbacks = [
+            f"Core Definitions and Conceptual Overview of {topic}",
+            f"Primary Methodologies and Operational Architectures of {topic}",
+            f"Current Technology Barriers and Implementation Bottlenecks in {topic}",
+            f"Key Innovations and Cutting-Edge Developments in {topic}",
+            f"Strategic Integration and Real-World Impact of {topic}",
+            f"Future Research Frontiers and Long-Term Trends of {topic}"
+        ]
+        num_subtopics = {"Quick": 3, "Standard": 5, "Deep": 6}.get(depth, 5)
+        return fallbacks[:num_subtopics]
 
 # Keep plan_research as a backwards-compatible alias
 async def plan_research(topic: str, depth: str) -> list[str]:
