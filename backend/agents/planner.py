@@ -1,14 +1,7 @@
-from google import genai
+from groq import Groq
 import os
 import logging
 import re
-
-_client = None
-def _get_client():
-    global _client
-    if _client is None:
-        _client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    return _client
 
 async def run_planner(topic: str, depth: str) -> list[str]:
     """
@@ -17,7 +10,7 @@ async def run_planner(topic: str, depth: str) -> list[str]:
     Returns a clean list of subtopic strings.
     """
     try:
-        client = _get_client()
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
         num_subtopics = {"Quick": 3, "Standard": 5, "Deep": 6}.get(depth, 5)
         
         prompt = f"""
@@ -32,11 +25,12 @@ async def run_planner(topic: str, depth: str) -> list[str]:
         3. Subtopic name three
         """
         
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}]
         )
-        text = response.text.strip()
+        result = response.choices[0].message.content
+        text = result.strip()
         
         # Parse the numbered list
         lines = text.split("\n")

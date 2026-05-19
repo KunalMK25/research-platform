@@ -1,14 +1,7 @@
-from google import genai
+from groq import Groq
 import os
 import json
 import logging
-
-_client = None
-def _get_client():
-    global _client
-    if _client is None:
-        _client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    return _client
 
 async def run_verifier(sources_by_subtopic: dict) -> dict:
     """
@@ -30,7 +23,7 @@ async def run_verifier(sources_by_subtopic: dict) -> dict:
             continue
             
         try:
-            client = _get_client()
+            client = Groq(api_key=os.getenv("GROQ_API_KEY"))
             sources_context = json.dumps([{"url": s["url"], "snippet": s["snippet"]} for s in sources])
             
             prompt = f"""
@@ -48,11 +41,12 @@ async def run_verifier(sources_by_subtopic: dict) -> dict:
             }}
             """
             
-            response = client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=prompt
+            response = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[{"role": "user", "content": prompt}]
             )
-            text = response.text.strip()
+            result = response.choices[0].message.content
+            text = result.strip()
             if text.startswith("```json"):
                 text = text[7:-3].strip()
             elif text.startswith("```"):

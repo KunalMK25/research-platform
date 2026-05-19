@@ -9,7 +9,7 @@ A full-stack, production-grade autonomous research orchestration platform. Verit
 - **Frontend**: Next.js 14 (App Router), Tailwind CSS, Framer Motion, ReactMarkdown
 - **Backend**: FastAPI, Async SQLAlchemy, SQLite (via `aiosqlite`)
 - **Vector Database**: ChromaDB
-- **Agents Swarm**: Gemini API (`gemini-2.0-flash` reasoning engine)
+- **Agents Swarm**: Groq API (`llama-3.1-8b-instant` reasoning engine)
 - **External Services**: Tavily Search API & arXiv Publications API
 - **Document Exporters**: ReportLab (PDF) & Python-PPTX (Widescreen Presentation slides)
 - **Authentication**: Firebase Client SDK (Google OAuth)
@@ -22,7 +22,7 @@ Create a `.env` file in the root directory based on the included `.env.example`:
 ```bash
 cp .env.example .env
 ```
-Ensure you fill in your `GEMINI_API_KEY`, `TAVILY_API_KEY`, and Firebase Web SDK keys.
+Ensure you fill in your `GROQ_API_KEY`, `TAVILY_API_KEY`, and Firebase Web SDK keys.
 
 ### 2. Backend Installation & Setup
 

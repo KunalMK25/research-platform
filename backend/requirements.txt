@@ -5,7 +5,7 @@ aiosqlite
 pydantic
 pydantic-settings
 python-dotenv
-google-generativeai
+groq
 tavily-python
 chromadb
 reportlab

@@ -1,4 +1,4 @@
-from google import genai
+from groq import Groq
 import os
 import re
 import logging
@@ -12,13 +12,6 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 
-_client = None
-def _get_client():
-    global _client
-    if _client is None:
-        _client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    return _client
-
 async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str:
     """
     Reporter Agent -> assembles final markdown report with the exact sections:
@@ -29,7 +22,7 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
     Returns full markdown string.
     """
     try:
-        client = _get_client()
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
         
         synthesis_text = ""
         for subtopic, paragraph in synthesis.items():
@@ -56,11 +49,12 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         (Compile a bibliography of cited source domains. Gather all '[Source: domain.com]' mentions in the text and list the unique domains in a clean bulleted list, such as '- domain.com')
         """
         
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}]
         )
-        return response.text.strip()
+        result = response.choices[0].message.content
+        return result.strip()
     except Exception as e:
         logging.error(f"Reporter failed: {e}")
         # Programmatic high-quality fallback report compilation
