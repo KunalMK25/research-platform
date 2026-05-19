@@ -1,49 +1,55 @@
-# Autonomous Agentic Research Platform
+# Verity AI — Multi-Agent Research Platform
 
-A full-stack web application where specialized AI agents autonomously plan, search, verify, synthesize, and generate professional research reports.
+Research anything. Trust everything.
+
+A full-stack, production-grade autonomous research orchestration platform. Verity AI deploys a cooperative swarm of specialized AI agents that sequentially plan, search, verify, synthesize, and compile highly detailed professional research briefs with verified citations.
 
 ## Architecture
 
-- **Frontend**: Next.js 14, Tailwind CSS, Framer Motion
-- **Backend**: FastAPI
-- **Database**: PostgreSQL / SQLite (via SQLAlchemy)
-- **Vector DB**: ChromaDB
-- **Agents**: Gemini API (planning, verifying, synthesizing, reporting)
-- **Search**: Tavily API & arXiv API
+- **Frontend**: Next.js 14 (App Router), Tailwind CSS, Framer Motion, ReactMarkdown
+- **Backend**: FastAPI, Async SQLAlchemy, SQLite (via `aiosqlite`)
+- **Vector Database**: ChromaDB
+- **Agents Swarm**: Gemini API (`gemini-2.0-flash` reasoning engine)
+- **External Services**: Tavily Search API & arXiv Publications API
+- **Document Exporters**: ReportLab (PDF) & Python-PPTX (Widescreen Presentation slides)
+- **Authentication**: Firebase Client SDK (Google OAuth)
 
 ## Setup Instructions
 
-### 1. Backend Setup
+### 1. Environment Configuration
 
+Create a `.env` file in the root directory based on the included `.env.example`:
+```bash
+cp .env.example .env
+```
+Ensure you fill in your `GEMINI_API_KEY`, `TAVILY_API_KEY`, and Firebase Web SDK keys.
+
+### 2. Backend Installation & Setup
+
+Navigate to the `backend` folder, set up your Python virtual environment, and install dependencies:
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+venv\Scripts\activate   # On Linux/macOS: source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Frontend Setup
-
+Initialize and seed mock database sessions (optional):
 ```bash
-cd frontend
-npm install
+python seed.py
 ```
 
-### 3. Environment Variables
-
-Create a `.env` file in the root directory based on `.env.example`:
-- Add your `GEMINI_API_KEY`
-- Add your `TAVILY_API_KEY`
-
-### 4. Running the Application
-
-**Run Backend (from `backend` folder):**
+Start the FastAPI development server:
 ```bash
 uvicorn main:app --reload --port 8000
 ```
 
-**Run Frontend (from `frontend` folder):**
+### 3. Frontend Installation & Setup
+
+Navigate to the `frontend` folder, install the package bundles, and start the Next.js development server:
 ```bash
+cd ../frontend
+npm install
 npm run dev
 ```
 

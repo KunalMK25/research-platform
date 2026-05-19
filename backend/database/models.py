@@ -5,14 +5,17 @@ from database.db import Base
 
 class ResearchSession(Base):
     __tablename__ = "research_sessions"
+    
     id = Column(String, primary_key=True, index=True)
-    user_id = Column(String, index=True)
-    topic = Column(String)
-    depth = Column(String)
-    status = Column(String)
+    user_id = Column(String, nullable=True, index=True)
+    topic = Column(String, nullable=False)
+    depth = Column(String, nullable=False) # Quick/Standard/Deep
+    status = Column(String, nullable=False) # pending/running/completed/failed
     created_at = Column(DateTime, default=datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    # Relationships
     subtopics = relationship("SubTopic", back_populates="session", cascade="all, delete-orphan")
     sources = relationship("Source", back_populates="session", cascade="all, delete-orphan")
     findings = relationship("Finding", back_populates="session", cascade="all, delete-orphan")
@@ -20,44 +23,54 @@ class ResearchSession(Base):
 
 class SubTopic(Base):
     __tablename__ = "subtopics"
+    
     id = Column(String, primary_key=True, index=True)
     session_id = Column(String, ForeignKey("research_sessions.id"))
-    title = Column(String)
-    status = Column(String)
+    title = Column(String, nullable=False)
+    status = Column(String, nullable=False) # pending/searching/verifying/done
+    order_index = Column(Integer, nullable=False, default=0)
     
+    # Relationships
     session = relationship("ResearchSession", back_populates="subtopics")
+
+class Report(Base):
+    __tablename__ = "reports"
+    
+    id = Column(String, primary_key=True, index=True)
+    session_id = Column(String, ForeignKey("research_sessions.id"), unique=True)
+    markdown_content = Column(Text, nullable=True)
+    metrics_json = Column(JSON, nullable=True) # e.g., {"word_count": int, "source_count": int, "time_taken": float}
+    pdf_path = Column(String, nullable=True)
+    ppt_path = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    session = relationship("ResearchSession", back_populates="report")
 
 class Source(Base):
     __tablename__ = "sources"
+    
     id = Column(String, primary_key=True, index=True)
     session_id = Column(String, ForeignKey("research_sessions.id"))
     subtopic_id = Column(String, ForeignKey("subtopics.id"), nullable=True)
-    title = Column(String)
-    url = Column(String)
-    domain = Column(String)
-    credibility_score = Column(Float)
+    title = Column(String, nullable=True)
+    url = Column(String, nullable=True)
+    domain = Column(String, nullable=True)
+    credibility_score = Column(Float, nullable=True)
     publish_date = Column(String, nullable=True)
     
+    # Relationships
     session = relationship("ResearchSession", back_populates="sources")
 
 class Finding(Base):
     __tablename__ = "findings"
+    
     id = Column(String, primary_key=True, index=True)
     session_id = Column(String, ForeignKey("research_sessions.id"))
     subtopic_id = Column(String, ForeignKey("subtopics.id"), nullable=True)
-    content = Column(Text)
-    confidence = Column(String)
-    citations = Column(JSON) # List of source URLs or IDs
+    content = Column(Text, nullable=True)
+    confidence = Column(String, nullable=True)
+    citations = Column(JSON, nullable=True) # List of source URLs or IDs
     
+    # Relationships
     session = relationship("ResearchSession", back_populates="findings")
-
-class Report(Base):
-    __tablename__ = "reports"
-    id = Column(String, primary_key=True, index=True)
-    session_id = Column(String, ForeignKey("research_sessions.id"))
-    markdown_content = Column(Text)
-    pdf_path = Column(String, nullable=True)
-    ppt_path = Column(String, nullable=True)
-    metrics_json = Column(JSON, nullable=True)
-    
-    session = relationship("ResearchSession", back_populates="report")

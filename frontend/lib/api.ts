@@ -16,6 +16,11 @@ export async function getResearchStatus(sessionId: string) {
   return res.json();
 }
 
+// Exactly matching requested name
+export async function getStatus(sessionId: string) {
+  return getResearchStatus(sessionId);
+}
+
 export async function getReport(sessionId: string) {
   const res = await fetch(`${API_URL}/research/${sessionId}/report`);
   if (!res.ok) throw new Error("Failed to get report");
@@ -26,4 +31,20 @@ export async function getHistory(userId: string) {
   const res = await fetch(`${API_URL}/history/${userId}`);
   if (!res.ok) throw new Error("Failed to get history");
   return res.json();
+}
+
+export async function exportPDF(sessionId: string): Promise<Blob> {
+  const res = await fetch(`${API_URL}/export/pdf/${sessionId}`, {
+    method: "POST"
+  });
+  if (!res.ok) throw new Error("Failed to export PDF");
+  return res.blob();
+}
+
+export async function exportPPT(sessionId: string): Promise<Blob> {
+  const res = await fetch(`${API_URL}/export/ppt/${sessionId}`, {
+    method: "POST"
+  });
+  if (!res.ok) throw new Error("Failed to export PPT");
+  return res.blob();
 }

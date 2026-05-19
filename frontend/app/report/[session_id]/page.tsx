@@ -7,12 +7,13 @@ import ReactMarkdown from "react-markdown";
 import { Loader2, Download, Share2 } from "lucide-react";
 
 export default function ReportPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.session_id as string;
   const [report, setReport] = useState<any>(null);
 
   useEffect(() => {
     if (!id) return;
-    getReport(id as string).then(data => setReport(data)).catch(console.error);
+    getReport(id).then(data => setReport(data)).catch(console.error);
   }, [id]);
 
   if (!report) {

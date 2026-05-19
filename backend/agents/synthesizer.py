@@ -10,44 +10,56 @@ def _get_client():
         _client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     return _client
 
-async def synthesize_findings(subtopic: str, sources: list[dict], depth: str) -> dict:
-    if not sources:
-        return {"content": f"No verified sources found for {subtopic}.", "citations": [], "confidence": "Low"}
-        
-    try:
-        client = _get_client()
-        sources_context = json.dumps([{"url": s["url"], "snippet": s["snippet"]} for s in sources])
-        
-        prompt = f"""
-        Synthesize the following sources for the subtopic: '{subtopic}'.
-        Write a cohesive summary. Every single claim MUST be followed by a citation in the format [Source: URL].
-        If no source supports a claim, mark it as [UNVERIFIED].
-        Sources: {sources_context}
-        
-        Output JSON ONLY:
-        {{
-            "content": "The synthesized text here...",
-            "confidence": "High" | "Medium" | "Low",
-            "citations": ["url1", "url2"]
-        }}
-        """
-        
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
-        )
-        text = response.text.strip()
-        if text.startswith("```json"):
-            text = text[7:-3].strip()
-        elif text.startswith("```"):
-            text = text[3:-3].strip()
+async def run_synthesizer(verified_sources: dict, topic: str) -> dict[str, str]:
+    """
+    Synthesizer Agent -> writes a 150-200 word summary per subtopic under the topic.
+    Every claim must reference a source with [Source: domain.com] inline.
+    Returns a dict mapping subtopic -> synthesis paragraph (string).
+    """
+    client = _get_client()
+    synthesis_results = {}
+    
+    for subtopic, sources in verified_sources.items():
+        if not sources:
+            synthesis_results[subtopic] = f"No verified sources were found to synthesize findings for the subtopic '{subtopic}'."
+            continue
             
-        result = json.loads(text)
-        return result
-    except Exception as e:
-        logging.error(f"Synthesizer failed: {e}")
-        return {
-            "content": f"Failed to synthesize for {subtopic}.",
-            "confidence": "Low",
-            "citations": []
-        }
+        try:
+            sources_context = json.dumps([{"domain": s["domain"], "snippet": s["snippet"]} for s in sources])
+            
+            prompt = f"""
+            You are a rigorous Synthesizer Agent.
+            Write a cohesive, informative 150-200 word summary paragraph for the subtopic '{subtopic}' under the main research topic '{topic}'.
+            
+            Strict Guidelines:
+            1. Every key claim, data point, or fact MUST be followed by an inline citation referencing the source domain in the EXACT format: [Source: domain.com].
+            2. Integrate all findings smoothly into a cohesive narrative paragraph. Do not use bullet points or numbered lists.
+            3. Do not include markdown headers, salutations, or concluding phrases. Output ONLY the plain text paragraph.
+            4. Keep the summary between 150 and 200 words.
+            
+            Sources to use:
+            {sources_context}
+            """
+            
+            response = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=prompt
+            )
+            synthesis_results[subtopic] = response.text.strip()
+            
+        except Exception as e:
+            logging.error(f"Synthesizer failed for {subtopic}: {e}")
+            synthesis_results[subtopic] = f"Failed to synthesize findings for '{subtopic}'."
+            
+    return synthesis_results
+
+# Keep synthesize_findings as a backwards-compatible wrapper
+async def synthesize_findings(subtopic: str, sources: list[dict], depth: str) -> dict:
+    res = await run_synthesizer({subtopic: sources}, topic=subtopic)
+    content = res.get(subtopic, "")
+    citations = [s["url"] for s in sources if s.get("url")]
+    return {
+        "content": content,
+        "confidence": "High" if len(sources) >= 3 else "Medium",
+        "citations": citations
+    }
