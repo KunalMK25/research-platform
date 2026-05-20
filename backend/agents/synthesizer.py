@@ -13,10 +13,10 @@ async def synthesize_single_subtopic(subtopic: str, sources: list[dict], topic: 
         sources_context = json.dumps([{"domain": s["domain"], "snippet": s["snippet"][:200]} for s in sources])
         
         prompt = f"""
-        Write a substantive, informative synthesis of '{subtopic}' under the broader topic '{topic}' in about 140 words.
-        Focus on delivering real insights, key findings, and meaningful analysis — not just source citations.
+        Write a thorough, informative synthesis of '{subtopic}' under the broader topic '{topic}' in about 180 words.
+        Deliver substantive insights, key findings, and meaningful analysis with real depth.
         Support claims with brief inline citations like [Source: domain.com] where appropriate.
-        Produce a cohesive paragraph with depth. Avoid simply listing sources or repeating their titles.
+        Produce a cohesive, well-developed paragraph. Avoid simply listing sources or repeating their titles.
         
         Source material available:
         {sources_context}

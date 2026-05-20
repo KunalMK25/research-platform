@@ -16,7 +16,7 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
     """
     Reporter Agent -> assembles final markdown report with the exact sections:
     # Executive Summary
-    ## Findings: [subtopic]
+    ## [subtopic] (directly, no "Findings:" prefix)
     ## Contradictions & Conflicting Claims  
     ## References
     Returns full markdown string.
@@ -26,7 +26,7 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         
         synthesis_text = ""
         for subtopic, paragraph in synthesis.items():
-            synthesis_text += f"## Findings: {subtopic}\n{paragraph}\n\n"
+            synthesis_text += f"--- {subtopic} ---\n{paragraph}\n\n"
             
         contradictions_text = "\n".join([f"- {c}" for c in contradictions]) if contradictions else "No major contradictions or conflicting claims were identified among the verified sources."
         
@@ -42,13 +42,13 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         Structure EXACTLY:
         # Executive Summary
         (Write an engaging 3-4 paragraph overview that captures the significance of the topic, the key discoveries, and the overall conclusions. Do NOT list sources here — focus on synthesis.)
-        ## Findings: [subtopic]
-        (For each subtopic, expand the provided synthesis into 1-2 paragraphs of substantive analysis. Integrate inline citations naturally.)
+        ## [subtopic title exactly as provided above]
+        (For each subtopic, write 2-3 paragraphs of substantive, well-developed analysis. Every subtopic must receive equal depth — do not let later sections become shorter. Integrate inline citations naturally.)
         ## Contradictions & Conflicting Claims
         ## References
         (Compile a clean, numbered bibliography. Extract all domains cited in the findings.)
         
-        Write authoritative, insightful content. Avoid simply echoing the source material — synthesize it into a coherent narrative.
+        Write authoritative, insightful content. Avoid simply echoing the source material — synthesize it into a coherent narrative. Every subtopic section must be equally thorough.
         """
         
         response = client.chat.completions.create(
@@ -68,7 +68,7 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         md.append("")
         
         for subtopic, paragraph in synthesis.items():
-            md.append(f"## Findings: {subtopic}")
+            md.append(f"## {subtopic}")
             md.append(paragraph)
             md.append("")
             
