@@ -15,3 +15,4 @@ arxiv
 python-multipart
 psycopg2-binary
 asyncpg
+google-generativeai

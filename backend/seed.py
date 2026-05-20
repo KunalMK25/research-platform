@@ -1,7 +1,7 @@
 import asyncio
 from database.db import AsyncSessionLocal, engine, Base
 from database.models import ResearchSession, SubTopic, Source, Finding, Report
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import uuid
 import json
 
@@ -19,8 +19,8 @@ async def seed_db():
             topic="The Impact of AGI on Global Economics",
             depth="Deep",
             status="completed",
-            created_at=datetime.utcnow() - timedelta(days=2),
-            completed_at=datetime.utcnow() - timedelta(days=2, hours=-1)
+            created_at=datetime.now(timezone.utc) - timedelta(days=2),
+            completed_at=datetime.now(timezone.utc) - timedelta(days=2, hours=-1)
         )
         db.add(session1)
         
@@ -55,7 +55,7 @@ None
             topic="Next-Gen Solid State Batteries",
             depth="Standard",
             status="running",
-            created_at=datetime.utcnow() - timedelta(minutes=5)
+            created_at=datetime.now(timezone.utc) - timedelta(minutes=5)
         )
         db.add(session2)
 

@@ -34,8 +34,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4f46e5/50;
-  background-color: #334155;
+  background: #334155;
 }
 
 /* Animated gradient glow effect keyframes */

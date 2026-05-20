@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Float, ForeignKey, JSON
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from database.db import Base
 
 class ResearchSession(Base):
@@ -11,9 +11,9 @@ class ResearchSession(Base):
     topic = Column(String, nullable=False)
     depth = Column(String, nullable=False) # Quick/Standard/Deep
     status = Column(String, nullable=False) # pending/running/completed/failed
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     completed_at = Column(DateTime, nullable=True)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     
     # Relationships
     subtopics = relationship("SubTopic", back_populates="session", cascade="all, delete-orphan")
@@ -42,7 +42,7 @@ class Report(Base):
     metrics_json = Column(JSON, nullable=True) # e.g., {"word_count": int, "source_count": int, "time_taken": float}
     pdf_path = Column(String, nullable=True)
     ppt_path = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     # Relationships
     session = relationship("ResearchSession", back_populates="report")

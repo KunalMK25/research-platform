@@ -2,7 +2,7 @@ import asyncio
 import logging
 import uuid
 import time
-import datetime
+from datetime import datetime, timezone
 from collections import defaultdict
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.db import AsyncSessionLocal
@@ -26,7 +26,7 @@ def push_progress(session_id: str, step: str, agent: str, message: str, detail: 
         "agent": agent,
         "message": message,
         "detail": detail,
-        "timestamp": datetime.datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
     progress_store[session_id].append(event)
     logger.info(f"[{step.upper()}] [{agent}] {message} - {detail}")
@@ -276,12 +276,12 @@ async def run_orchestrator(session_id: str, topic: str, depth: str):
                 metrics_json=metrics,
                 pdf_path=pdf_path_gen if pdf_path_gen else None,
                 ppt_path=ppt_path_gen if ppt_path_gen else None,
-                created_at=datetime.datetime.utcnow()
+                created_at=datetime.now(timezone.utc)
             )
             db.add(db_report)
 
             session.status = "completed"
-            session.completed_at = datetime.datetime.utcnow()
+            session.completed_at = datetime.now(timezone.utc)
             await db.commit()
 
             push_progress(
