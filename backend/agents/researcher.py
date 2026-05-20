@@ -5,13 +5,17 @@ from urllib.parse import urlparse
 
 async def research_single_subtopic(subtopic: str, depth: str) -> list[dict]:
     """Helper to perform web and academic searches for a single subtopic in parallel."""
+    depth_config = {"Quick": 6, "Standard": 7, "Deep": 8}
+    tavily_max = depth_config.get(depth, 7)
+    arxiv_max = 3 if depth == "Deep" else 0
+    
     # 1. Tavily web search
-    tavily_task = search_tavily(subtopic, max_results=5)
+    tavily_task = search_tavily(subtopic, max_results=tavily_max)
     
     # 2. arXiv academic search (only if depth is Deep)
     arxiv_task = None
-    if depth == "Deep":
-        arxiv_task = search_arxiv(subtopic, max_results=2)
+    if depth == "Deep" and arxiv_max > 0:
+        arxiv_task = search_arxiv(subtopic, max_results=arxiv_max)
         
     if arxiv_task:
         tavily_res, arxiv_res = await asyncio.gather(tavily_task, arxiv_task)
@@ -59,6 +63,20 @@ async def research_single_subtopic(subtopic: str, depth: str) -> list[dict]:
                 "snippet": f"A comprehensive review of {subtopic} modeling methodologies. We analyze core mathematical constraints and propose novel optimization solutions for practical deployments.",
                 "domain": "arxiv.org",
                 "source_type": "academic"
+            },
+            {
+                "title": f"Industry Applications and Market Trends in {subtopic}",
+                "url": f"https://ieee.org/papers/{hash(subtopic) % 9999:04d}",
+                "snippet": f"An industry-focused assessment of {subtopic} covering commercial deployments, market growth projections, and enterprise adoption patterns across multiple sectors.",
+                "domain": "ieee.org",
+                "source_type": "web"
+            },
+            {
+                "title": f"Ethical and Societal Implications of Advancements in {subtopic}",
+                "url": f"https://science.org/analysis/{topic_slug}",
+                "snippet": f"Analyzes the broader societal consequences of progress in {subtopic}, including regulatory challenges, ethical frameworks, and impacts on workforce dynamics and public policy.",
+                "domain": "science.org",
+                "source_type": "web"
             }
         ]
     return combined

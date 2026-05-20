@@ -11,11 +11,12 @@ async def run_planner(topic: str, depth: str) -> list[str]:
     """
     try:
         client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-        num_subtopics = {"Quick": 3, "Standard": 5, "Deep": 6}.get(depth, 5)
+        num_subtopics = {"Quick": 4, "Standard": 7, "Deep": 9}.get(depth, 7)
         
         prompt = f"""
         You are an expert Research Planner.
         Break the topic '{topic}' into exactly {num_subtopics} focused, high-quality, non-overlapping subtopics.
+        Each subtopic should be detailed and specific — avoid generic or overlapping categories.
         
         Output ONLY a numbered list of these subtopics, with one subtopic per line. Do not include markdown, bold text, introductory remarks, or any other explanations.
         
@@ -67,9 +68,12 @@ async def run_planner(topic: str, depth: str) -> list[str]:
             f"Current Technology Barriers and Implementation Bottlenecks in {topic}",
             f"Key Innovations and Cutting-Edge Developments in {topic}",
             f"Strategic Integration and Real-World Impact of {topic}",
-            f"Future Research Frontiers and Long-Term Trends of {topic}"
+            f"Future Research Frontiers and Long-Term Trends of {topic}",
+            f"Comparative Analysis of Alternative Approaches in {topic}",
+            f"Regulatory and Ethical Considerations Surrounding {topic}",
+            f"Case Studies and Real-World Applications of {topic}"
         ]
-        num_subtopics = {"Quick": 3, "Standard": 5, "Deep": 6}.get(depth, 5)
+        num_subtopics = {"Quick": 4, "Standard": 7, "Deep": 9}.get(depth, 7)
         return fallbacks[:num_subtopics]
 
 # Keep plan_research as a backwards-compatible alias
