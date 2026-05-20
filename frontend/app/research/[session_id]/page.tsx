@@ -277,7 +277,7 @@ export default function ResearchSessionPage() {
                 animate={{ opacity: 1 }}
                 className="w-full max-w-2xl mt-12"
               >
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest text-center mb-6">Investigative Outline</h3>
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest text-center mb-6">Research Areas Being Investigated</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {subtopics.map((st) => (
                     <div 
@@ -297,7 +297,7 @@ export default function ResearchSessionPage() {
                       ) : (
                         <Circle className="w-4 h-4 text-slate-700 shrink-0" />
                       )}
-                      <span className="text-sm font-medium line-clamp-1">{st.title}</span>
+                      <span className="text-sm font-medium line-clamp-2">{st.title}</span>
                     </div>
                   ))}
                 </div>

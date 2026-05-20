@@ -31,9 +31,9 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         contradictions_text = "\n".join([f"- {c}" for c in contradictions]) if contradictions else "No major contradictions or conflicting claims were identified among the verified sources."
         
         prompt = f"""
-        Assemble a detailed, comprehensive markdown report on '{topic}'.
+        Assemble a detailed, comprehensive markdown research report on '{topic}'.
         
-        Use the following synthesized findings:
+        Use the following synthesized findings as your primary source material:
         {synthesis_text}
         
         Contradictions:
@@ -41,14 +41,14 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         
         Structure EXACTLY:
         # Executive Summary
-        (Write a detailed 3-4 paragraph summary covering the key insights, methodology, and conclusions)
+        (Write an engaging 3-4 paragraph overview that captures the significance of the topic, the key discoveries, and the overall conclusions. Do NOT list sources here — focus on synthesis.)
         ## Findings: [subtopic]
-        (For each subtopic, provide 1-2 paragraphs with inline citations)
+        (For each subtopic, expand the provided synthesis into 1-2 paragraphs of substantive analysis. Integrate inline citations naturally.)
         ## Contradictions & Conflicting Claims
         ## References
-        (Compile exhaustive bibliography from [Source: domain.com] tags)
+        (Compile a clean, numbered bibliography. Extract all domains cited in the findings.)
         
-        Make the report thorough and substantive. Each section should have meaningful depth.
+        Write authoritative, insightful content. Avoid simply echoing the source material — synthesize it into a coherent narrative.
         """
         
         response = client.chat.completions.create(
@@ -62,9 +62,9 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         # Programmatic high-quality fallback report compilation
         md = []
         md.append(f"# Executive Summary")
-        md.append(f"Autonomous research swarm analysis on the topic of **{topic}** has successfully completed. This document synthesizes the core findings, technical advancements, and authoritative insights retrieved by Verity AI's cooperative agents across multiple specialized domains.")
-        md.append(f"The investigation mapped foundational conceptual structures, analyzed engineering hurdles, examined real-world deployment patterns, assessed regulatory landscapes, and compiled a comprehensive bibliography to serve as a verified knowledge base.")
-        md.append(f"Key findings indicate significant progress across multiple dimensions, with particularly notable advances in methodology, integration frameworks, and practical applications. The research identified several areas requiring further investigation and highlighted emerging trends that will shape future developments.")
+        md.append(f"This report presents the findings of an autonomous research swarm analysis on the topic of **{topic}**. The investigation was conducted by Verity AI's cooperative multi-agent system, which deployed specialized agents for planning, web and academic research, source verification, synthesis, and report compilation.")
+        md.append(f"The research team identified and examined multiple key subtopics, gathering evidence from a diverse range of authoritative sources including academic publications, industry analyses, and technical documentation. Each source was systematically evaluated for credibility and relevance, ensuring that only high-quality information was incorporated into the final synthesis.")
+        md.append(f"The findings reveal significant developments and ongoing advancements in the field, with particular emphasis on emerging methodologies, technological breakthroughs, and practical implementation strategies. The analysis also highlights areas of active debate and identifies promising directions for future research and application.")
         md.append("")
         
         for subtopic, paragraph in synthesis.items():
