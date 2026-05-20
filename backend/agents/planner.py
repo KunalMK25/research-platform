@@ -11,7 +11,7 @@ async def run_planner(topic: str, depth: str) -> list[str]:
     """
     try:
         client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-        num_subtopics = {"Quick": 4, "Standard": 7, "Deep": 9}.get(depth, 7)
+        num_subtopics = {"Quick": 3, "Standard": 5, "Deep": 7}.get(depth, 5)
         
         prompt = f"""
         You are an expert Research Planner.
@@ -69,11 +69,9 @@ async def run_planner(topic: str, depth: str) -> list[str]:
             f"Key Innovations and Cutting-Edge Developments in {topic}",
             f"Strategic Integration and Real-World Impact of {topic}",
             f"Future Research Frontiers and Long-Term Trends of {topic}",
-            f"Comparative Analysis of Alternative Approaches in {topic}",
-            f"Regulatory and Ethical Considerations Surrounding {topic}",
-            f"Case Studies and Real-World Applications of {topic}"
+            f"Comparative Analysis of Alternative Approaches in {topic}"
         ]
-        num_subtopics = {"Quick": 4, "Standard": 7, "Deep": 9}.get(depth, 7)
+        num_subtopics = {"Quick": 3, "Standard": 5, "Deep": 7}.get(depth, 5)
         return fallbacks[:num_subtopics]
 
 # Keep plan_research as a backwards-compatible alias

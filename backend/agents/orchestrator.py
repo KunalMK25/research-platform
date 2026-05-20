@@ -149,7 +149,7 @@ async def run_orchestrator(session_id: str, topic: str, depth: str):
             # Run verifier (takes dict, returns dict with filtered sources and list of contradictions)
             # We pass a title-keyed dict to match run_verifier's logic
             verifier_input = {db_st.title: sources_by_subtopic.get(db_st.title, []) for db_st in db_subtopics}
-            verifier_result = await run_verifier(verifier_input)
+            verifier_result = await run_verifier(verifier_input, depth)
             
             verified_sources_by_title = verifier_result.get("verified_sources", {})
             all_contradictions = verifier_result.get("contradictions", [])
@@ -197,7 +197,7 @@ async def run_orchestrator(session_id: str, topic: str, depth: str):
 
             # Run synthesizer (takes dict mapping subtopic -> verified sources, topic)
             # Returns dict mapping subtopic -> synthesis paragraph string
-            synthesis_result = await run_synthesizer(verified_sources_by_title, topic)
+            synthesis_result = await run_synthesizer(verified_sources_by_title, topic, depth)
 
             # Save Finding rows & update Subtopic DB status to "done"
             db_findings = []
@@ -243,11 +243,11 @@ async def run_orchestrator(session_id: str, topic: str, depth: str):
                 step="reporting",
                 agent="Reporter",
                 message="Assembling final structured markdown report...",
-                detail="Synthesizing Executive Summary, Findings, bibliography, and contradictions"
+                detail="Assembling Executive Summary, analysis sections, bibliography, and contradictions"
             )
 
             # Execute run_reporter
-            report_md = await run_reporter(synthesis_result, all_contradictions, topic)
+            report_md = await run_reporter(synthesis_result, all_contradictions, topic, depth)
 
             # Calculate report metrics and time taken
             word_count = len(report_md.split())

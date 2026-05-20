@@ -12,7 +12,7 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 
-async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str:
+async def run_reporter(synthesis: dict, contradictions: list, topic: str, depth: str = "Standard") -> str:
     """
     Reporter Agent -> assembles final markdown report with the exact sections:
     # Executive Summary
@@ -30,8 +30,12 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
             
         contradictions_text = "\n".join([f"- {c}" for c in contradictions]) if contradictions else "No major contradictions or conflicting claims were identified among the verified sources."
         
+        depth_detail = {"Quick": "concise 2-paragraph", "Standard": "detailed 2-3 paragraph", "Deep": "thorough 3-4 paragraph"}
+        detail_level = depth_detail.get(depth, "detailed 2-3 paragraph")
+        exec_paras = 2 if depth == "Quick" else (3 if depth == "Standard" else 4)
+        
         prompt = f"""
-        Assemble a detailed, comprehensive markdown research report on '{topic}'.
+        Assemble a markdown research report on '{topic}' at {depth.lower()} detail level.
         
         Use the following synthesized findings as your primary source material:
         {synthesis_text}
@@ -41,14 +45,14 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         
         Structure EXACTLY:
         # Executive Summary
-        (Write an engaging 3-4 paragraph overview that captures the significance of the topic, the key discoveries, and the overall conclusions. Do NOT list sources here — focus on synthesis.)
+        (Write a {exec_paras}-paragraph summary covering the key insights and conclusions. Do NOT list sources here.)
         ## [subtopic title exactly as provided above]
-        (For each subtopic, write 2-3 paragraphs of substantive, well-developed analysis. Every subtopic must receive equal depth — do not let later sections become shorter. Integrate inline citations naturally.)
+        (For each subtopic, write {detail_level} analysis. Every subtopic must receive equal depth.)
         ## Contradictions & Conflicting Claims
         ## References
-        (Compile a clean, numbered bibliography. Extract all domains cited in the findings.)
+        (Compile a clean, numbered bibliography.)
         
-        Write authoritative, insightful content. Avoid simply echoing the source material — synthesize it into a coherent narrative. Every subtopic section must be equally thorough.
+        Write authoritative content. Synthesize into a coherent narrative.
         """
         
         response = client.chat.completions.create(
@@ -96,11 +100,11 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str) -> str
         return "\n".join(md)
 
 # Keep generate_report as a backwards-compatible wrapper
-async def generate_report(topic: str, findings: list[dict], contradictions: list[str]) -> str:
+async def generate_report(topic: str, findings: list[dict], contradictions: list[str], depth: str = "Standard") -> str:
     synthesis = {}
     for i, f in enumerate(findings):
         synthesis[f"Subtopic {i+1}"] = f.get("content", "")
-    return await run_reporter(synthesis, contradictions, topic)
+    return await run_reporter(synthesis, contradictions, topic, depth)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PDF GENERATION (ReportLab)

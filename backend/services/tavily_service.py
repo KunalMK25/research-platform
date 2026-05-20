@@ -7,11 +7,11 @@ try:
 except:
     tavily = None
 
-async def search_tavily(query: str, max_results: int = 5) -> list[dict]:
+async def search_tavily(query: str, max_results: int = 5, search_depth: str = "advanced") -> list[dict]:
     if not tavily:
         return []
     try:
-        response = tavily.search(query=query, search_depth="advanced", max_results=max_results)
+        response = tavily.search(query=query, search_depth=search_depth, max_results=max_results)
         return [{"title": r["title"], "url": r["url"], "content": r["content"]} for r in response.get("results", [])]
     except Exception as e:
         print(f"Tavily search failed: {e}")

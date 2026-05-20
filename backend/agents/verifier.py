@@ -4,7 +4,10 @@ import json
 import logging
 import asyncio
 
-async def verify_single_subtopic(subtopic: str, sources: list[dict], client: AsyncGroq) -> tuple[str, list[dict], list[str]]:
+async def verify_single_subtopic(subtopic: str, sources: list[dict], client: AsyncGroq, max_sources: int = 8) -> tuple[str, list[dict], list[str]]:
+    """Helper to verify sources for a single subtopic asynchronously."""
+    if max_sources > 0:
+        sources = sources[:max_sources]
     """Helper to verify sources for a single subtopic asynchronously."""
     if not sources:
         return subtopic, [], []
@@ -53,7 +56,7 @@ async def verify_single_subtopic(subtopic: str, sources: list[dict], client: Asy
             s["credibility_score"] = 8
         return subtopic, sources, []
 
-async def run_verifier(sources_by_subtopic: dict) -> dict:
+async def run_verifier(sources_by_subtopic: dict, depth: str = "Standard") -> dict:
     """
     Verifier Agent -> scores and fact-checks sources for all subtopics in parallel using AsyncGroq.
     Discards sources scoring below 5.
@@ -66,9 +69,11 @@ async def run_verifier(sources_by_subtopic: dict) -> dict:
     """
     client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
     
+    max_sources_per_subtopic = {"Quick": 4, "Standard": 6, "Deep": 8}.get(depth, 6)
+    
     tasks = []
     for subtopic, sources in sources_by_subtopic.items():
-        tasks.append(verify_single_subtopic(subtopic, sources, client))
+        tasks.append(verify_single_subtopic(subtopic, sources, client, max_sources_per_subtopic))
         
     results = await asyncio.gather(*tasks)
     
@@ -84,6 +89,6 @@ async def run_verifier(sources_by_subtopic: dict) -> dict:
     }
 
 # Keep verify_sources as a backwards-compatible wrapper
-async def verify_sources(sources: list[dict]) -> tuple[list[dict], list[str]]:
-    res = await run_verifier({"subtopic": sources})
+async def verify_sources(sources: list[dict], depth: str = "Standard") -> tuple[list[dict], list[str]]:
+    res = await run_verifier({"subtopic": sources}, depth)
     return res["verified_sources"].get("subtopic", []), res["contradictions"]
