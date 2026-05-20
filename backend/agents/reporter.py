@@ -30,9 +30,9 @@ async def run_reporter(synthesis: dict, contradictions: list, topic: str, depth:
             
         contradictions_text = "\n".join([f"- {c}" for c in contradictions]) if contradictions else "No major contradictions or conflicting claims were identified among the verified sources."
         
-        depth_detail = {"Quick": "concise 2-paragraph", "Standard": "detailed 2-3 paragraph", "Deep": "thorough 3-4 paragraph"}
-        detail_level = depth_detail.get(depth, "detailed 2-3 paragraph")
-        exec_paras = 2 if depth == "Quick" else (3 if depth == "Standard" else 4)
+        depth_detail = {"Quick": "concise 1-2 paragraph", "Standard": "detailed 2 paragraph", "Deep": "thorough 2-3 paragraph"}
+        detail_level = depth_detail.get(depth, "detailed 2 paragraph")
+        exec_paras = 2 if depth == "Quick" else (2 if depth == "Standard" else 3)
         
         prompt = f"""
         Assemble a markdown research report on '{topic}' at {depth.lower()} detail level.

@@ -5,10 +5,10 @@ from urllib.parse import urlparse
 
 async def research_single_subtopic(subtopic: str, depth: str) -> list[dict]:
     """Helper to perform web and academic searches for a single subtopic in parallel."""
-    depth_config = {"Quick": 3, "Standard": 5, "Deep": 7}
-    tavily_max = depth_config.get(depth, 5)
-    arxiv_max = 2 if depth == "Deep" else 0
-    search_depth = "basic" if depth == "Quick" else "advanced"
+    depth_config = {"Quick": 3, "Standard": 4, "Deep": 5}
+    tavily_max = depth_config.get(depth, 4)
+    arxiv_max = 0
+    search_depth = "basic"
     
     # 1. Tavily web search
     tavily_task = search_tavily(subtopic, max_results=tavily_max, search_depth=search_depth)

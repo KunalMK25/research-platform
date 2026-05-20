@@ -4,7 +4,7 @@ import json
 import logging
 import asyncio
 
-WORD_TARGET = {"Quick": 80, "Standard": 130, "Deep": 180}
+WORD_TARGET = {"Quick": 60, "Standard": 80, "Deep": 100}
 
 async def synthesize_single_subtopic(subtopic: str, sources: list[dict], topic: str, client: AsyncGroq, depth: str = "Standard") -> tuple[str, str]:
     """Helper to synthesize findings for a single subtopic asynchronously."""
@@ -13,7 +13,7 @@ async def synthesize_single_subtopic(subtopic: str, sources: list[dict], topic: 
         
     try:
         word_target = WORD_TARGET.get(depth, 130)
-        max_snippet = {"Quick": 100, "Standard": 150, "Deep": 200}.get(depth, 150)
+        max_snippet = {"Quick": 80, "Standard": 100, "Deep": 150}.get(depth, 100)
         sources_context = json.dumps([{"domain": s["domain"], "snippet": s["snippet"][:max_snippet]} for s in sources])
         
         prompt = f"""
@@ -36,8 +36,8 @@ async def synthesize_single_subtopic(subtopic: str, sources: list[dict], topic: 
     except Exception as e:
         logging.error(f"Synthesizer failed for {subtopic}: {e}")
         # Programmatic fallback: build a cohesive paragraph from all sources
-        max_snippet = {"Quick": 100, "Standard": 150, "Deep": 200}.get(depth, 150)
-        min_words = {"Quick": 30, "Standard": 45, "Deep": 60}.get(depth, 45)
+        max_snippet = {"Quick": 80, "Standard": 100, "Deep": 150}.get(depth, 100)
+        min_words = {"Quick": 25, "Standard": 35, "Deep": 45}.get(depth, 35)
         sentences = []
         sentences.append(f"A comprehensive analysis of {subtopic} reveals several important findings grounded in current research.")
         for i, s in enumerate(sources):
